@@ -1,0 +1,13 @@
+:root {
+  --navy: #06324f;
+  --blue: #0b6a8f;
+  --teal: #12a3a0;
+  --mint: #8ff0d0;
+  --amber: #f2a900;
+  --bg: #f1f9fb;
+  --card: #ffffff;
+  --text: #0b2a3f;
+  --muted: #5b7585;
+  --radius: 16px;
+  --shadow: 0 6px 18px rgba(11, 106, 143, 0.12);
+}
