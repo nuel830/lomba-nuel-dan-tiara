@@ -1,3 +1,5 @@
+
+import { useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Layout from './components/layout/Layout.jsx'
 import ProtectedRoute from './components/common/ProtectedRoute.jsx'
@@ -11,8 +13,13 @@ import MissionsPage from './pages/MissionsPage.jsx'
 import LoginPage from './pages/LoginPage.jsx'
 import NotFound from './pages/NotFound.jsx'
 import AdminDashboard from './pages/admin/AdminDashboard.jsx'
+import { testSupabase } from './lib/testSupabase'
 
 export default function App() {
+  useEffect(() => {
+    testSupabase()
+  }, [])
+
   return (
     <Routes>
       <Route element={<Layout />}>

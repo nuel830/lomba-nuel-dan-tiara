@@ -1,0 +1,372 @@
+
+.lg-report-form {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 30px;
+  border: 1px solid #e1eaf5;
+  border-radius: 22px;
+  background: #ffffff;
+  color: #19345b;
+  box-shadow: 0 12px 35px rgba(38, 84, 132, 0.07);
+  font-family: Inter, "Segoe UI", sans-serif;
+}
+
+.lg-report-form * {
+  box-sizing: border-box;
+}
+
+.lg-form-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 32px;
+}
+
+.lg-heading-icon,
+.lg-step {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 43px;
+  height: 43px;
+  border-radius: 14px;
+  color: #1674e8;
+  background: #eaf3ff;
+}
+
+.lg-heading-icon {
+  font-size: 21px;
+}
+
+.lg-form-heading h2,
+.lg-section-title h3 {
+  margin: 0;
+  color: #19345b;
+}
+
+.lg-form-heading h2 {
+  font-size: 23px;
+  font-weight: 750;
+}
+
+.lg-form-heading p,
+.lg-section-title p {
+  margin: 6px 0 0;
+  color: #71829c;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.lg-form-section {
+  margin-bottom: 29px;
+}
+
+.lg-section-title {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 17px;
+}
+
+.lg-step {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.lg-section-title h3 {
+  font-size: 15px;
+  font-weight: 750;
+}
+
+.lg-issue-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  padding-left: 49px;
+}
+
+.lg-choice-card {
+  position: relative;
+  display: flex;
+  min-height: 112px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 12px 7px;
+  border: 1px solid #dce6f3;
+  border-radius: 13px;
+  background: #fff;
+  color: #516784;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+}
+
+.lg-choice-card:hover,
+.lg-area-card:hover {
+  border-color: #80b7ff;
+  transform: translateY(-2px);
+}
+
+.lg-choice-card.selected,
+.lg-area-card.selected {
+  border: 2px solid #2380f5;
+  background: #f3f8ff;
+  color: #145fbe;
+}
+
+.lg-choice-icon {
+  font-size: 27px;
+}
+
+.lg-selected-mark {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: #2380f5;
+  color: white;
+  font-size: 12px;
+}
+
+.lg-area-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding-left: 49px;
+}
+
+.lg-area-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 66px;
+  padding: 12px;
+  border: 1px solid #dce6f3;
+  border-radius: 12px;
+  background: #fff;
+  color: #516784;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.lg-area-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #65c99d;
+}
+
+.lg-area-card.blue .lg-area-dot {
+  background: #68aaf3;
+}
+
+.lg-area-card.purple .lg-area-dot {
+  background: #9874dc;
+}
+
+.lg-description {
+  display: block;
+  width: calc(100% - 49px);
+  margin-left: 49px;
+  padding: 15px;
+  border: 1px solid #dce6f3;
+  border-radius: 12px;
+  outline: none;
+  resize: vertical;
+  background: #fcfdff;
+  color: #19345b;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.7;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.lg-description::placeholder {
+  color: #a0afc4;
+}
+
+.lg-description:focus {
+  border-color: #398bf3;
+  box-shadow: 0 0 0 3px #eaf3ff;
+}
+
+.lg-character-count {
+  margin: 6px 0 0 49px;
+  text-align: right;
+  color: #96a4b8;
+  font-size: 11px;
+}
+
+.lg-location-panel {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-left: 49px;
+  padding: 16px;
+  border: 1px solid #d8eee5;
+  border-radius: 13px;
+  background: #f2fbf7;
+}
+
+.lg-location-symbol {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: #d9f4e8;
+  font-size: 20px;
+}
+
+.lg-location-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.lg-location-info strong {
+  color: #168562;
+  font-size: 13px;
+}
+
+.lg-location-info p {
+  margin: 5px 0 0;
+  color: #708a85;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.lg-location-status {
+  color: #169b72;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.lg-gps-button {
+  margin: 12px 0 0 49px;
+  padding: 12px 16px;
+  border: 1px solid #cfe3ff;
+  border-radius: 10px;
+  background: #eef6ff;
+  color: #176bd1;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.lg-gps-button:hover {
+  background: #deedff;
+}
+
+.lg-form-message {
+  margin: 18px 0;
+  padding: 14px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.lg-form-message.success {
+  border: 1px solid #bcebd6;
+  background: #effbf5;
+  color: #08794f;
+}
+
+.lg-form-message.error {
+  border: 1px solid #fecaca;
+  background: #fff4f4;
+  color: #b42318;
+}
+
+.lg-submit-button {
+  width: 100%;
+  min-height: 50px;
+  margin-top: 5px;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(110deg, #1976e9, #368df7);
+  box-shadow: 0 7px 16px rgba(35, 128, 245, 0.2);
+  color: #fff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 750;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.lg-submit-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(35, 128, 245, 0.28);
+}
+
+.lg-submit-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.lg-privacy-note {
+  margin: 17px 0 0;
+  text-align: center;
+  color: #7c8ca3;
+  font-size: 12px;
+}
+
+@media (max-width: 760px) {
+  .lg-report-form {
+    padding: 20px 16px;
+    border-radius: 16px;
+  }
+
+  .lg-form-heading h2 {
+    font-size: 20px;
+  }
+
+  .lg-issue-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding-left: 0;
+  }
+
+  .lg-area-grid {
+    padding-left: 0;
+    gap: 8px;
+  }
+
+  .lg-area-card {
+    gap: 7px;
+    padding: 10px 5px;
+  }
+
+  .lg-description,
+  .lg-character-count,
+  .lg-location-panel,
+  .lg-gps-button {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .lg-area-grid {
+    grid-template-columns: 1fr;
+  }
+}
