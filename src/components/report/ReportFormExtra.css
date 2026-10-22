@@ -1,0 +1,156 @@
+/* Tambahan untuk fitur lapor: foto, kondisi tambahan, peta lokasi, layar sukses.
+   Memakai palet yang sama dengan ReportForm.css */
+
+.lg-hint { color: #71829c; font-size: 13px; line-height: 1.6; margin: 4px 0 0; }
+
+.lg-field-error {
+  margin: 10px 0 0 49px;
+  color: #c2410c;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.lg-qr-badge {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: #eaf3ff;
+  color: #1674e8;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.lg-area-hint {
+  display: block;
+  margin-top: 2px;
+  color: #71829c;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* Kondisi tambahan */
+.lg-checks { display: flex; gap: 12px; flex-wrap: wrap; margin-left: 49px; }
+.lg-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border: 1.5px solid #dbe6f3;
+  border-radius: 14px;
+  background: #fff;
+  color: #19345b;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.lg-check:hover { border-color: #9cc3f5; }
+.lg-check.on { border-color: #1674e8; background: #eef5ff; }
+.lg-check input { width: 18px; height: 18px; accent-color: #1674e8; }
+
+/* Foto */
+.lg-photo-drop {
+  display: flex;
+  width: calc(100% - 49px);
+  margin-left: 49px;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 26px 16px;
+  border: 2px dashed #b7cdea;
+  border-radius: 16px;
+  background: #f7faff;
+  color: #1674e8;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.lg-photo-drop:hover { background: #eef5ff; border-color: #1674e8; }
+.lg-photo-icon { font-size: 28px; }
+
+.lg-photo-preview {
+  display: flex;
+  margin-left: 49px;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 12px;
+  border: 1.5px solid #dbe6f3;
+  border-radius: 16px;
+  background: #fff;
+}
+.lg-photo-preview img {
+  width: 140px;
+  height: 105px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+.lg-photo-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+/* Peta lokasi */
+.lg-map-wrap { margin: 14px 0 14px 49px; overflow: hidden; border-radius: 14px; border: 1px solid #dbe6f3; }
+.lg-gps-button:disabled { opacity: .7; cursor: wait; }
+
+/* Tombol umum */
+.lg-btn-primary,
+.lg-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: inherit;
+}
+.lg-btn-primary { border: 0; background: #1674e8; color: #fff; }
+.lg-btn-primary:hover { background: #0f62c9; }
+.lg-btn-secondary { border: 1.5px solid #c9d9ee; background: #fff; color: #19345b; }
+.lg-btn-secondary:hover { border-color: #1674e8; color: #1674e8; }
+.lg-btn-secondary.danger:hover { border-color: #dc2626; color: #dc2626; }
+
+/* Layar sukses */
+.lg-success { text-align: center; }
+.lg-success h2 { margin: 12px 0 0; font-size: 24px; color: #19345b; }
+.lg-success-icon {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: #dcfce7;
+  color: #16a34a;
+  font-size: 32px;
+  font-weight: 800;
+}
+.lg-success-code-box {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 22px 0;
+  padding: 16px 32px;
+  border: 2px dashed #9cc3f5;
+  border-radius: 16px;
+  background: #f4f8ff;
+}
+.lg-success-code-box span { color: #71829c; font-size: 12px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
+.lg-success-code-box strong { color: #1674e8; font-size: 32px; letter-spacing: 3px; }
+.lg-success-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+/* HP: tanpa indentasi, sama seperti ReportForm.css */
+@media (max-width: 760px) {
+  .lg-field-error,
+  .lg-checks,
+  .lg-photo-drop,
+  .lg-photo-preview,
+  .lg-map-wrap { margin-left: 0; }
+  .lg-photo-drop { width: 100%; }
+  .lg-check { flex: 1 1 100%; }
+  .lg-area-card { flex-direction: column; justify-content: center; gap: 4px; }
+  .lg-area-hint { margin-top: 0; text-align: center; }
+  .lg-success-code-box strong { font-size: 26px; }
+}

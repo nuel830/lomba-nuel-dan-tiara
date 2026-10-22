@@ -1,240 +1,347 @@
-
-import { useState } from 'react'
-import { supabase } from '../../lib/supabase'
+import { useEffect, useRef, useState } from 'react'
+import { useLanguage } from '../../context/LanguageContext.jsx'
+import { REPORT_TYPES, AREA_SIZES } from '../../lib/constants.js'
+import { validateImage, compressImage } from '../../lib/image.js'
+import { createReport } from '../../services/reportService.js'
+import LocationPicker from '../map/LocationPicker.jsx'
+import ReportSuccess from './ReportSuccess.jsx'
 import './ReportForm.css'
+import './ReportFormExtra.css'
 
-const issueOptions = [
-  { value: 'sampah', label: 'Sampah', icon: '🗑️' },
-  { value: 'pencemaran', label: 'Pencemaran Air', icon: '💧' },
-  { value: 'ikan_mati', label: 'Ikan Mati', icon: '🐟' },
-  { value: 'bau', label: 'Bau Tidak Biasa', icon: '〰️' },
-  { value: 'lainnya', label: 'Lainnya', icon: '🌿' },
-]
+const SIZE_COLORS = { small: 'green', medium: 'blue', large: 'purple' }
+const MY_REPORTS_KEY = 'lg_my_reports'
 
-const areaOptions = [
-  { value: 'kecil', label: 'Kecil', color: 'green' },
-  { value: 'sedang', label: 'Sedang', color: 'blue' },
-  { value: 'besar', label: 'Besar', color: 'purple' },
-]
+function rememberCode(code) {
+  try {
+    const list = JSON.parse(localStorage.getItem(MY_REPORTS_KEY) || '[]')
+    localStorage.setItem(MY_REPORTS_KEY, JSON.stringify([code, ...list].slice(0, 50)))
+  } catch {
+    // localStorage bisa diblokir; tidak masalah
+  }
+}
 
-export default function ReportForm() {
-  const [issueType, setIssueType] = useState('')
-  const [areaSize, setAreaSize] = useState('')
+export default function ReportForm({ locationId }) {
+  const { t } = useLanguage()
+  const formRef = useRef(null)
+  const fileInputRef = useRef(null)
+
+  const [type, setType] = useState('')
+  const [size, setSize] = useState('')
+  const [hasOdor, setHasOdor] = useState(false)
+  const [hasDeadFish, setHasDeadFish] = useState(false)
   const [description, setDescription] = useState('')
-  const [location, setLocation] = useState(null)
-  const [loading, setLoading] = useState(false)
-  const [message, setMessage] = useState('')
-  const [success, setSuccess] = useState(false)
+  const [photo, setPhoto] = useState(null) // { blob, previewUrl, sizeKB }
+  const [position, setPosition] = useState(null) // { lat, lng, accuracy, fly }
+  const [gpsLoading, setGpsLoading] = useState(false)
+  const [gpsMessage, setGpsMessage] = useState('')
+  const [photoError, setPhotoError] = useState('')
+  const [errors, setErrors] = useState({})
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
+  const [result, setResult] = useState(null)
 
-  function getLocation() {
-    setMessage('')
+  // Bersihkan URL pratinjau foto saat diganti atau form ditutup
+  useEffect(() => () => photo && URL.revokeObjectURL(photo.previewUrl), [photo])
 
-    if (!navigator.geolocation) {
-      setMessage('Browser tidak mendukung fitur GPS.')
+  async function handlePhotoChange(event) {
+    const file = event.target.files?.[0]
+    event.target.value = '' // agar file yang sama bisa dipilih ulang
+    if (!file) return
+    setPhotoError('')
+
+    const problem = validateImage(file)
+    if (problem) {
+      setPhotoError(t(problem === 'toobig' ? 'form.photo.toobig' : 'form.photo.invalid'))
       return
     }
+    try {
+      const blob = await compressImage(file)
+      setPhoto({ blob, previewUrl: URL.createObjectURL(blob), sizeKB: Math.round(blob.size / 1024) })
+    } catch {
+      setPhotoError(t('form.photo.failed'))
+    }
+  }
 
+  function getLocation() {
+    setGpsMessage('')
+    if (!navigator.geolocation) {
+      setGpsMessage(t('form.gps.unsupported'))
+      return
+    }
+    setGpsLoading(true)
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
-        setLocation({
-          latitude: coords.latitude,
-          longitude: coords.longitude,
-        })
-        setMessage('Lokasi berhasil didapatkan.')
-        setSuccess(true)
+        setPosition({ lat: coords.latitude, lng: coords.longitude, accuracy: coords.accuracy, fly: true })
+        setErrors((e) => ({ ...e, location: undefined }))
+        setGpsMessage('')
+        setGpsLoading(false)
       },
-      () => {
-        setMessage('Lokasi gagal diambil. Izinkan akses lokasi di browser.')
-        setSuccess(false)
+      (err) => {
+        const key = err.code === 1 ? 'denied' : err.code === 3 ? 'timeout' : 'unavailable'
+        setGpsMessage(t(`form.gps.${key}`))
+        setGpsLoading(false)
       },
-      { enableHighAccuracy: true, timeout: 10000 }
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     )
+  }
+
+  function pickPosition(p) {
+    setPosition(p)
+    setGpsMessage('')
+    setErrors((e) => ({ ...e, location: undefined }))
+  }
+
+  function validate() {
+    const next = {}
+    if (!type) next.type = t('form.err.type')
+    if (!size) next.size = t('form.err.size')
+    if (!position) next.location = t('form.err.location')
+    return next
   }
 
   async function handleSubmit(event) {
     event.preventDefault()
-    setMessage('')
-    setSuccess(false)
+    if (submitting) return
+    setSubmitError('')
 
-    if (!issueType || !areaSize) {
-      setMessage('Pilih jenis masalah dan luas area terlebih dahulu.')
+    const next = validate()
+    setErrors(next)
+    if (Object.keys(next).length > 0) {
+      // Gulir ke pesan kesalahan pertama
+      requestAnimationFrame(() =>
+        formRef.current?.querySelector('.lg-field-error')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      )
       return
     }
 
-    setLoading(true)
+    setSubmitting(true)
+    const { data, error } = await createReport({
+      type,
+      size,
+      hasOdor,
+      hasDeadFish,
+      description: description.trim(),
+      lat: position.lat,
+      lng: position.lng,
+      locationId,
+      photoBlob: photo?.blob ?? null,
+    })
+    setSubmitting(false)
 
-    const reportCode = `LG-${Date.now().toString(36).toUpperCase()}`
-
-    try {
-      const { error } = await supabase.from('reports').insert({
-        report_code: reportCode,
-        issue_type: issueType,
-        area_size: areaSize,
-        description: description.trim() || null,
-        latitude: location?.latitude ?? null,
-        longitude: location?.longitude ?? null,
-      })
-
-      if (error) throw error
-
-      setMessage(`Laporan berhasil dikirim! Kode laporan: ${reportCode}`)
-      setSuccess(true)
-      setIssueType('')
-      setAreaSize('')
-      setDescription('')
-      setLocation(null)
-    } catch (error) {
+    if (error) {
       console.error('Gagal menyimpan laporan:', error)
-      setMessage(`Laporan gagal disimpan: ${error.message}`)
-      setSuccess(false)
-    } finally {
-      setLoading(false)
+      if (error.message === 'NO_DB') setSubmitError(t('form.err.nodb'))
+      else if (/failed to fetch|network/i.test(error.message)) setSubmitError(t('form.err.network'))
+      else setSubmitError(t('form.err.generic') + error.message)
+      return
     }
+
+    rememberCode(data.code)
+    setResult(data)
+  }
+
+  function resetForm() {
+    setType(''); setSize(''); setHasOdor(false); setHasDeadFish(false)
+    setDescription(''); setPhoto(null); setPosition(null)
+    setErrors({}); setSubmitError(''); setGpsMessage(''); setPhotoError('')
+    setResult(null)
+  }
+
+  if (result) {
+    return <ReportSuccess code={result.code} photoFailed={result.photoFailed} onNew={resetForm} />
   }
 
   return (
-    <form className="lg-report-form" onSubmit={handleSubmit}>
+    <form className="lg-report-form" onSubmit={handleSubmit} ref={formRef} noValidate>
       <div className="lg-form-heading">
         <div className="lg-heading-icon">📋</div>
         <div>
-          <h2>Formulir Laporan</h2>
-          <p>Isi informasi berikut dengan lengkap dan akurat.</p>
+          <h2>{t('form.title')}</h2>
+          <p>{t('form.subtitle')}</p>
+          {locationId && <span className="lg-qr-badge">{t('form.qr.from')}: {locationId}</span>}
         </div>
       </div>
 
+      {/* 1. Jenis masalah */}
       <div className="lg-form-section">
         <div className="lg-section-title">
           <span className="lg-step">1</span>
           <div>
-            <h3>Jenis Masalah</h3>
-            <p>Pilih masalah yang kamu temukan di sekitar danau.</p>
+            <h3>{t('form.step1.title')}</h3>
+            <p>{t('form.step1.desc')}</p>
           </div>
         </div>
-
         <div className="lg-issue-grid">
-          {issueOptions.map((item) => (
+          {REPORT_TYPES.map((item) => (
             <button
               key={item.value}
               type="button"
-              className={`lg-choice-card ${
-                issueType === item.value ? 'selected' : ''
-              }`}
-              onClick={() => setIssueType(item.value)}
-              aria-pressed={issueType === item.value}
+              className={`lg-choice-card ${type === item.value ? 'selected' : ''}`}
+              onClick={() => { setType(item.value); setErrors((e) => ({ ...e, type: undefined })) }}
+              aria-pressed={type === item.value}
             >
               <span className="lg-choice-icon">{item.icon}</span>
-              <span>{item.label}</span>
-              {issueType === item.value && (
-                <span className="lg-selected-mark">✓</span>
-              )}
+              <span>{t(`type.${item.value}`)}</span>
+              {type === item.value && <span className="lg-selected-mark">✓</span>}
             </button>
           ))}
         </div>
+        {errors.type && <p className="lg-field-error">{errors.type}</p>}
       </div>
 
+      {/* 2. Luas area */}
       <div className="lg-form-section">
         <div className="lg-section-title">
           <span className="lg-step">2</span>
           <div>
-            <h3>Luas Area Terdampak</h3>
-            <p>Perkirakan luas area yang terdampak.</p>
+            <h3>{t('form.step2.title')}</h3>
+            <p>{t('form.step2.desc')}</p>
           </div>
         </div>
-
         <div className="lg-area-grid">
-          {areaOptions.map((item) => (
+          {AREA_SIZES.map((item) => (
             <button
               key={item.value}
               type="button"
-              className={`lg-area-card ${item.color} ${
-                areaSize === item.value ? 'selected' : ''
-              }`}
-              onClick={() => setAreaSize(item.value)}
-              aria-pressed={areaSize === item.value}
+              className={`lg-area-card ${SIZE_COLORS[item.value]} ${size === item.value ? 'selected' : ''}`}
+              onClick={() => { setSize(item.value); setErrors((e) => ({ ...e, size: undefined })) }}
+              aria-pressed={size === item.value}
             >
               <span className="lg-area-dot" />
-              <span>{item.label}</span>
-              {areaSize === item.value && (
-                <span className="lg-selected-mark">✓</span>
-              )}
+              <span>{t(`size.${item.value}`)}</span>
+              <small className="lg-area-hint">{t(`size.${item.value}.hint`)}</small>
+              {size === item.value && <span className="lg-selected-mark">✓</span>}
             </button>
           ))}
         </div>
+        {errors.size && <p className="lg-field-error">{errors.size}</p>}
       </div>
 
+      {/* 3. Kondisi tambahan */}
       <div className="lg-form-section">
         <div className="lg-section-title">
           <span className="lg-step">3</span>
           <div>
-            <h3>Deskripsi Laporan</h3>
-            <p>Ceritakan kondisi yang kamu lihat.</p>
+            <h3>{t('form.step3.title')}</h3>
+            <p>{t('form.step3.desc')}</p>
           </div>
         </div>
-
-        <textarea
-          className="lg-description"
-          value={description}
-          onChange={(event) => setDescription(event.target.value)}
-          placeholder="Contoh: Sampah plastik terlihat menumpuk di tepi danau..."
-          rows={5}
-          maxLength={500}
-        />
-        <div className="lg-character-count">{description.length}/500</div>
+        <div className="lg-checks">
+          <label className={`lg-check ${hasOdor ? 'on' : ''}`}>
+            <input type="checkbox" checked={hasOdor} onChange={(e) => setHasOdor(e.target.checked)} />
+            <span>〰️ {t('form.odor')}</span>
+          </label>
+          <label className={`lg-check ${hasDeadFish ? 'on' : ''}`}>
+            <input type="checkbox" checked={hasDeadFish} onChange={(e) => setHasDeadFish(e.target.checked)} />
+            <span>🐟 {t('form.deadFish')}</span>
+          </label>
+        </div>
       </div>
 
+      {/* 4. Foto */}
       <div className="lg-form-section">
         <div className="lg-section-title">
           <span className="lg-step">4</span>
           <div>
-            <h3>Lokasi GPS</h3>
-            <p>Tambahkan lokasi agar masalah mudah ditemukan.</p>
+            <h3>{t('form.step4.title')}</h3>
+            <p>{t('form.step4.desc')}</p>
           </div>
+        </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          capture="environment"
+          onChange={handlePhotoChange}
+          hidden
+          data-testid="photo-input"
+        />
+        {photo ? (
+          <div className="lg-photo-preview">
+            <img src={photo.previewUrl} alt="" />
+            <div className="lg-photo-actions">
+              <span className="lg-hint">{photo.sizeKB} KB</span>
+              <button type="button" className="lg-btn-secondary" onClick={() => fileInputRef.current?.click()}>
+                {t('form.photo.change')}
+              </button>
+              <button type="button" className="lg-btn-secondary danger" onClick={() => setPhoto(null)}>
+                {t('form.photo.remove')}
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button type="button" className="lg-photo-drop" onClick={() => fileInputRef.current?.click()}>
+            <span className="lg-photo-icon">📷</span>
+            <span>{t('form.photo.choose')}</span>
+          </button>
+        )}
+        {photoError && <p className="lg-field-error">{photoError}</p>}
+      </div>
+
+      {/* 5. Lokasi */}
+      <div className="lg-form-section">
+        <div className="lg-section-title">
+          <span className="lg-step">5</span>
+          <div>
+            <h3>{t('form.step5.title')}</h3>
+            <p>{t('form.step5.desc')}</p>
+          </div>
+        </div>
+
+        <button type="button" className="lg-gps-button" onClick={getLocation} disabled={gpsLoading}>
+          <span>◎</span> {gpsLoading ? t('form.gps.loading') : t('form.gps.button')}
+        </button>
+        {gpsMessage && <p className="lg-field-error">{gpsMessage}</p>}
+
+        <div className="lg-map-wrap">
+          <LocationPicker position={position} onPick={pickPosition} />
         </div>
 
         <div className="lg-location-panel">
           <div className="lg-location-symbol">📍</div>
           <div className="lg-location-info">
-            <strong>{location ? 'Lokasi terdeteksi' : 'Lokasi belum ditambahkan'}</strong>
-            <p>
-              {location
-                ? `${location.latitude.toFixed(5)}, ${location.longitude.toFixed(5)}`
-                : 'Tekan tombol untuk mengambil lokasi kamu.'}
+            <strong>{position ? t('form.loc.set') : t('form.loc.none')}</strong>
+            <p data-testid="coords">
+              {position
+                ? `${position.lat.toFixed(5)}, ${position.lng.toFixed(5)}` +
+                  (position.accuracy ? ` · ${t('form.loc.accuracy')} ${Math.round(position.accuracy)} m` : '')
+                : t('form.loc.hint')}
             </p>
           </div>
-          <span className="lg-location-status">
-            {location ? '✓' : '○'}
-          </span>
+          <span className="lg-location-status">{position ? '✓' : '○'}</span>
         </div>
-
-        <button
-          type="button"
-          className="lg-gps-button"
-          onClick={getLocation}
-        >
-          <span>◎</span> Ambil Lokasi Sekarang
-        </button>
+        {errors.location && <p className="lg-field-error">{errors.location}</p>}
       </div>
 
-      {message && (
-        <div
-          className={`lg-form-message ${success ? 'success' : 'error'}`}
-          role="status"
-        >
-          {message}
+      {/* 6. Deskripsi */}
+      <div className="lg-form-section">
+        <div className="lg-section-title">
+          <span className="lg-step">6</span>
+          <div>
+            <h3>{t('form.step6.title')}</h3>
+            <p>{t('form.step6.desc')}</p>
+          </div>
         </div>
+        <textarea
+          className="lg-description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder={t('form.desc.placeholder')}
+          rows={4}
+          maxLength={500}
+        />
+        <div className="lg-character-count">{description.length}/500</div>
+      </div>
+
+      {submitError && (
+        <div className="lg-form-message error" role="alert">{submitError}</div>
       )}
 
-      <button
-        className="lg-submit-button"
-        type="submit"
-        disabled={loading}
-      >
-        {loading ? 'Mengirim laporan...' : '➤  Kirim Laporan'}
+      <button className="lg-submit-button" type="submit" disabled={submitting}>
+        {submitting ? t('form.submitting') : `➤  ${t('form.submit')}`}
       </button>
 
-      <p className="lg-privacy-note">
-        🌱 Terima kasih sudah ikut menjaga kebersihan danau kita.
-      </p>
+      <p className="lg-privacy-note">🌱 {t('form.thanks')}</p>
     </form>
   )
 }

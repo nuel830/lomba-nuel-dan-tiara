@@ -1,3 +1,5 @@
+// Pusat konstanta. Ubah di sini, seluruh web ikut berubah.
+
 // Titik tengah peta (kira-kira Danau Toba). Sesuaikan nanti.
 export const MAP_CENTER = [2.65, 98.85]
 export const MAP_ZOOM = 10

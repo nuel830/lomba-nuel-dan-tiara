@@ -1,7 +1,11 @@
-
-import { supabase } from './supabase'
+import { supabase } from './supabaseClient.js'
 
 export async function testSupabase() {
+  if (!supabase) {
+    console.warn('Supabase belum dikonfigurasi. Cek file .env')
+    return
+  }
+
   const { data, error } = await supabase
     .from('reports')
     .select('id')

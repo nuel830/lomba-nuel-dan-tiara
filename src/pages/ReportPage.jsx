@@ -8,8 +8,7 @@ export default function ReportPage() {
   return (
     <section>
       <h1>{t('report.title')}</h1>
-      {locationId && <p className="muted">Titik: {locationId}</p>}
-      <ReportForm />
+      <ReportForm locationId={locationId} />
     </section>
   )
 }
