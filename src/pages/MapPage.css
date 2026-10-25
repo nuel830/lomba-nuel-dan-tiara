@@ -1,0 +1,149 @@
+/* Halaman Peta Hotspot. Palet sama dengan form lapor. */
+
+.lg-map-page { color: #19345b; }
+.lg-map-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+.lg-map-head h1 { margin-bottom: 2px; }
+
+/* Ringkasan angka */
+.lg-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+.lg-stats > div {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px;
+  border: 1px solid #e1eaf5;
+  border-radius: 14px;
+  background: #fff;
+}
+.lg-stats b { font-size: 26px; line-height: 1.1; color: #1674e8; }
+.lg-stats > div:nth-child(4) b { color: #dc2626; }
+.lg-stats span { color: #71829c; font-size: 12px; font-weight: 700; }
+
+/* Tata letak peta + sisi */
+.lg-map-layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+.lg-map-box { position: relative; overflow: hidden; border: 1px solid #e1eaf5; border-radius: 18px; background: #e8eef5; }
+.lg-report-map { height: 600px; width: 100%; z-index: 0; }
+.lg-map-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 500;
+  transform: translate(-50%, -50%);
+  max-width: 80%;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .95);
+  box-shadow: 0 6px 20px rgba(25, 52, 91, .15);
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+.lg-map-side { display: grid; gap: 14px; }
+
+/* Keterangan */
+.lg-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; margin-top: 10px; font-size: 12px; color: #4b5f7d; }
+.lg-legend-item { display: inline-flex; align-items: center; gap: 5px; }
+.lg-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #64748b; }
+.lg-dot.plastic { background: #2563eb; } .lg-dot.effluent { background: #dc2626; }
+.lg-dot.hyacinth { background: #16a34a; } .lg-dot.turbid { background: #a16207; }
+.lg-dot.other { background: #64748b; } .lg-dot.cleaned { background: #cbd5e1; }
+
+/* Penanda tetesan */
+.lg-pin-wrap { background: none; border: 0; }
+.lg-pin {
+  --c: #64748b;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 2.5px solid #fff;
+  border-radius: 50% 50% 50% 0;
+  background: var(--c);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, .35);
+  transform: rotate(-45deg);
+}
+.lg-pin span { font-size: 15px; transform: rotate(45deg); line-height: 1; }
+.lg-pin.plastic { --c: #2563eb; } .lg-pin.effluent { --c: #dc2626; }
+.lg-pin.hyacinth { --c: #16a34a; } .lg-pin.turbid { --c: #a16207; } .lg-pin.other { --c: #64748b; }
+.lg-pin.cleaned { opacity: .5; filter: grayscale(.7); }
+
+/* Cincin titik rawan berdenyut pelan */
+.lg-hotspot-ring { animation: lgPulse 2.2s ease-in-out infinite; }
+@keyframes lgPulse { 0%, 100% { fill-opacity: .14; } 50% { fill-opacity: .34; } }
+@media (prefers-reduced-motion: reduce) { .lg-hotspot-ring { animation: none; } }
+
+/* Popup */
+.lg-popup { display: flex; flex-direction: column; gap: 5px; font-family: inherit; }
+.lg-popup-photo { width: 100%; height: 110px; object-fit: cover; border-radius: 10px; }
+.lg-popup strong { font-size: 14px; color: #19345b; }
+.lg-popup small { color: #71829c; font-size: 12px; }
+.lg-popup .lg-pill { align-self: flex-start; }
+.lg-popup-link { margin-top: 2px; color: #1674e8 !important; font-weight: 700; font-size: 13px; text-decoration: none; }
+.lg-pill { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; white-space: nowrap; }
+.lg-pill.reported { background: #fff4d6; color: #a16207; }
+.lg-pill.verified { background: #e0efff; color: #1d4ed8; }
+.lg-pill.scheduled { background: #efe7ff; color: #6d28d9; }
+.lg-pill.cleaned { background: #dcfce7; color: #15803d; }
+
+/* Filter */
+.lg-filters { display: grid; gap: 14px; padding: 16px; border: 1px solid #e1eaf5; border-radius: 18px; background: #fff; }
+.lg-filter-group h4 { margin: 0 0 8px; font-size: 13px; color: #19345b; }
+.lg-filter-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.lg-fchip {
+  padding: 6px 11px;
+  border: 1.5px solid #dbe6f3;
+  border-radius: 20px;
+  background: #fff;
+  color: #71829c;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+.lg-fchip em { margin-left: 3px; font-style: normal; font-weight: 800; opacity: .7; }
+.lg-fchip.on { border-color: #1674e8; background: #eef5ff; color: #1674e8; }
+.lg-select {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1.5px solid #dbe6f3;
+  border-radius: 10px;
+  background: #fff;
+  color: #19345b;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+}
+.lg-switch { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.lg-switch input { width: 17px; height: 17px; accent-color: #dc2626; }
+
+/* Titik rawan */
+.lg-hotspots { padding: 16px; border: 1px solid #e1eaf5; border-radius: 18px; background: #fff; }
+.lg-hotspots h3 { margin: 0 0 4px; font-size: 16px; }
+.lg-hotspot-empty { margin: 12px 0 0; padding: 12px; border-radius: 10px; background: #f7faff; color: #71829c; font-size: 13px; line-height: 1.5; }
+.lg-hotspot-items { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 8px; max-height: 300px; overflow-y: auto; }
+.lg-hotspot-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1.5px solid #e1eaf5;
+  border-radius: 12px;
+  background: #fff;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.lg-hotspot-item:hover { border-color: #1674e8; background: #f7faff; }
+.lg-rank { display: grid; flex-shrink: 0; place-items: center; width: 28px; height: 28px; border-radius: 50%; color: #fff; font-size: 13px; font-weight: 800; }
+.lg-rank.high { background: #dc2626; } .lg-rank.medium { background: #f97316; } .lg-rank.low { background: #eab308; }
+.lg-hotspot-main { display: flex; flex: 1; min-width: 0; flex-direction: column; }
+.lg-hotspot-main strong { font-size: 13px; }
+.lg-hotspot-main small { color: #71829c; font-size: 12px; }
+.lg-hotspot-go { color: #1674e8; font-size: 12px; font-weight: 700; white-space: nowrap; }
+
+@media (max-width: 900px) {
+  .lg-map-layout { grid-template-columns: 1fr; }
+  .lg-report-map { height: 420px; }
+  .lg-stats { grid-template-columns: repeat(2, 1fr); }
+}

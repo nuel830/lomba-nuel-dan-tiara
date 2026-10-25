@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { getReports } from '../services/reportService.js'
 
 export function useReports() {
@@ -6,13 +6,17 @@ export function useReports() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  useEffect(() => {
-    getReports().then(({ data, error }) => {
-      setReports(data ?? [])
-      setError(error)
-      setLoading(false)
-    })
+  const load = useCallback(async () => {
+    setLoading(true)
+    const { data, error } = await getReports()
+    setReports(data ?? [])
+    setError(error)
+    setLoading(false)
   }, [])
 
-  return { reports, loading, error }
+  useEffect(() => {
+    load()
+  }, [load])
+
+  return { reports, loading, error, reload: load }
 }
