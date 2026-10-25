@@ -1,0 +1,176 @@
+/* Halaman Lacak Laporan. Palet sama dengan form lapor. */
+
+.lg-track { max-width: 760px; margin: 0 auto; color: #19345b; }
+.lg-track h1 { margin-bottom: 4px; }
+.lg-muted { color: #71829c; font-size: 13px; line-height: 1.6; margin: 0; }
+.lg-track-sub { margin-bottom: 18px; font-size: 14px; }
+
+/* Kotak pencarian */
+.lg-track-search { display: flex; gap: 10px; margin-bottom: 16px; }
+.lg-track-input {
+  flex: 1;
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1.5px solid #dbe6f3;
+  border-radius: 14px;
+  background: #fff;
+  color: #19345b;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  outline: none;
+  font-family: inherit;
+}
+.lg-track-input::placeholder { color: #a0afc4; font-weight: 600; }
+.lg-track-input:focus { border-color: #398bf3; box-shadow: 0 0 0 3px #eaf3ff; }
+
+.lg-track-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  border: 1.5px solid #c9d9ee;
+  border-radius: 12px;
+  background: #fff;
+  color: #19345b;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+}
+.lg-track-btn:hover:not(:disabled) { border-color: #1674e8; color: #1674e8; }
+.lg-track-btn.primary { border-color: #1674e8; background: #1674e8; color: #fff; }
+.lg-track-btn.primary:hover:not(:disabled) { background: #0f62c9; color: #fff; }
+.lg-track-btn:disabled { opacity: .65; cursor: wait; }
+
+.lg-link-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #1674e8;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.lg-track-msg {
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  background: #f1f6fc;
+  color: #19345b;
+  font-size: 14px;
+}
+.lg-track-msg.error { background: #fff3ec; color: #c2410c; font-weight: 600; }
+
+/* Status berwarna */
+.lg-pill {
+  display: inline-block;
+  flex-shrink: 0;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.lg-pill.reported  { background: #fff4d6; color: #a16207; }
+.lg-pill.verified  { background: #e0efff; color: #1d4ed8; }
+.lg-pill.scheduled { background: #efe7ff; color: #6d28d9; }
+.lg-pill.cleaned   { background: #dcfce7; color: #15803d; }
+
+/* Hasil pelacakan */
+.lg-result {
+  padding: 24px;
+  border: 1px solid #e1eaf5;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 12px 35px rgba(38, 84, 132, 0.07);
+}
+.lg-result-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.lg-result-label { color: #71829c; font-size: 12px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; }
+.lg-result-head h2 { margin: 2px 0 4px; color: #1674e8; font-size: 28px; letter-spacing: 2px; }
+
+.lg-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 4px; }
+.lg-chip {
+  padding: 6px 12px;
+  border: 1px solid #dbe6f3;
+  border-radius: 20px;
+  background: #f7faff;
+  font-size: 13px;
+  font-weight: 600;
+}
+.lg-chip.warn { border-color: #fcd9bd; background: #fff3ec; color: #c2410c; }
+
+.lg-result-section { margin-top: 22px; }
+.lg-result-section h3 { margin: 0 0 10px; font-size: 15px; color: #19345b; }
+.lg-desc { margin: 0; padding: 12px 14px; border-radius: 12px; background: #f7faff; font-size: 14px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+.lg-result-photo { display: block; width: 100%; max-height: 380px; object-fit: cover; border-radius: 14px; border: 1px solid #dbe6f3; }
+.lg-coords { margin-top: 8px; }
+.lg-coords a { color: #1674e8; font-weight: 700; }
+
+.lg-result-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; padding-top: 18px; border-top: 1px solid #edf2f9; }
+
+/* Timeline vertikal */
+.lg-timeline { list-style: none; margin: 0; padding: 0; }
+.lg-tl-item { position: relative; display: flex; gap: 14px; padding-bottom: 20px; }
+.lg-tl-item:last-child { padding-bottom: 0; }
+.lg-tl-item:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 32px;
+  bottom: 0;
+  width: 2px;
+  background: #dbe6f3;
+}
+.lg-tl-item.done:not(:last-child)::before { background: #16a34a; }
+.lg-tl-dot {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #eaf0f8;
+  color: #8a9bb3;
+  font-size: 13px;
+  font-weight: 800;
+}
+.lg-tl-item.done .lg-tl-dot { background: #16a34a; color: #fff; }
+.lg-tl-item.current .lg-tl-dot { background: #1674e8; color: #fff; box-shadow: 0 0 0 5px #dbeafe; }
+.lg-tl-body strong { font-size: 15px; }
+.lg-tl-item.todo .lg-tl-body { opacity: .55; }
+.lg-tl-body p { margin: 2px 0 0; color: #71829c; font-size: 13px; }
+.lg-tl-body time { display: block; margin-top: 4px; color: #19345b; font-size: 12px; font-weight: 700; }
+.lg-tl-body .lg-tl-note { margin-top: 6px; padding: 8px 10px; border-radius: 10px; background: #f1f6fc; color: #19345b; }
+
+/* Laporan Saya */
+.lg-my { margin-top: 8px; padding: 20px; border: 1px solid #e1eaf5; border-radius: 18px; background: #fff; }
+.lg-my-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.lg-my-head h3 { margin: 0; font-size: 16px; }
+.lg-my-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.lg-my-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1.5px solid #e1eaf5;
+  border-radius: 14px;
+  color: inherit;
+  text-decoration: none;
+}
+.lg-my-item:hover { border-color: #1674e8; background: #f7faff; }
+.lg-my-icon { font-size: 22px; }
+.lg-my-main { display: flex; flex: 1; min-width: 0; flex-direction: column; }
+.lg-my-main strong { letter-spacing: 1px; }
+.lg-my-main small { color: #71829c; font-size: 12px; }
+
+@media (max-width: 560px) {
+  .lg-result { padding: 18px 14px; }
+  .lg-result-head { flex-direction: column-reverse; }
+  .lg-result-head h2 { font-size: 24px; }
+  .lg-track-search { flex-direction: column; }
+}

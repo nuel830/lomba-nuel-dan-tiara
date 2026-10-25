@@ -70,9 +70,24 @@ export async function getReports() {
   return supabase.from('reports').select('*').order('created_at', { ascending: false })
 }
 
+// Satu laporan lengkap beserta riwayat statusnya. data = null bila tidak ditemukan.
 export async function getReportByCode(code) {
-  if (!supabase) return { data: null, error: null }
-  return supabase.from('reports').select('*, report_status_history(*)').eq('code', code).single()
+  if (!supabase) return { data: null, error: new Error('NO_DB') }
+  return supabase
+    .from('reports')
+    .select('*, report_status_history(*)')
+    .eq('code', code)
+    .maybeSingle()
+}
+
+// Ringkasan beberapa laporan sekaligus (untuk daftar "Laporan Saya")
+export async function getReportsByCodes(codes) {
+  if (!supabase || codes.length === 0) return { data: [], error: null }
+  return supabase
+    .from('reports')
+    .select('code, type, size, status, created_at')
+    .in('code', codes)
+    .order('created_at', { ascending: false })
 }
 
 export async function confirmReport(reportId) {
